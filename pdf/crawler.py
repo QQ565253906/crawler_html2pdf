@@ -9,7 +9,7 @@ import time
 try:
     from urllib.parse import urlparse  # py3
 except:
-    from urlparse import urlparse  # py2
+    import urlparse
 
 import pdfkit
 import requests
@@ -51,7 +51,8 @@ class Crawler(object):
         网络请求,返回response对象
         :return:
         """
-        response = requests.get(url, **kwargs)
+        headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0'}
+        response = requests.get(url, headers=headers)
         return response
 
     def parse_menu(self, response):
@@ -93,6 +94,8 @@ class Crawler(object):
             with open(f_name, 'wb') as f:
                 f.write(html)
             htmls.append(f_name)
+            if index >= 2:
+                break
 
         pdfkit.from_file(htmls, self.name + ".pdf", options=options)
         for html in htmls:
@@ -114,8 +117,10 @@ class LiaoxuefengPythonCrawler(Crawler):
         """
         soup = BeautifulSoup(response.content, "html.parser")
         menu_tag = soup.find_all(class_="uk-nav uk-nav-side")[1]
-        for li in menu_tag.find_all("li"):
-            url = li.a.get("href")
+        # for li in menu_tag.find_all("li"):
+        for li in menu_tag.find_all("a"):
+            # url = li.a.get("href")
+            url = li.get("href")
             if not url.startswith("http"):
                 url = "".join([self.domain, url])  # 补全为全路径
             yield url
