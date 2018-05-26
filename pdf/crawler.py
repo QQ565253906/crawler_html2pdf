@@ -53,6 +53,10 @@ class Crawler(object):
         """
         headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0'}
         response = requests.get(url, headers=headers)
+        start = time.time()
+        time.sleep( 5 )
+        total_time = time.time() - start
+        print(u"延迟了：%f 秒" % total_time)
         return response
 
     def parse_menu(self, response):
